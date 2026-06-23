@@ -2350,6 +2350,20 @@ else:  # Markdown (.md)
         md_text = uploaded_md.read().decode("utf-8")
         st.caption(f"Loaded **{uploaded_md.name}** — {len(md_text):,} characters")
 
+        # Detect CMS-fields markdown (pipe table with Section / Field Name / Input Type headers)
+        _cms_fields_header = re.search(
+            r"\|\s*Section\s*\|.*Field Name.*\|.*Input Type.*\|",
+            md_text, re.IGNORECASE
+        )
+        if _cms_fields_header:
+            st.error(
+                "⚠️ This looks like a **CMS-fields markdown file** "
+                "(contains a `Section | Field Name | Input Type` table). "
+                "Use the **Push CMS Fields (.md, up to 5)** mode in the sidebar instead — "
+                "this mode is for plain article markdown only."
+            )
+            st.stop()
+
         md_html = _md_lib.markdown(
             md_text,
             extensions=["tables", "fenced_code", "nl2br"],
